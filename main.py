@@ -26,14 +26,13 @@ urls_to_city_pages = [
 ]
 
 
-print(len(urls_to_city_pages))
+# print(len(urls_to_city_pages))
 
 class City:
     def __init__(self, url, province, city_name, **kwargs):
         self.url = f"https://pl.wikipedia.org/{url}"
         self.province = province
         self.city_name = city_name
-        # self.latitude, self.longitude = self.convert_coordinates(latitude, longitude)
         self.latitude, self.longitude = self.convert_coordinates(kwargs['latitude'], kwargs['longitude'])
 
     def __str__(self):
@@ -81,7 +80,6 @@ class City:
 
 def find_data(url):
     response = requests.get(url=url)
-    # request.(method='get', url=url)
 
     bs = BeautifulSoup(response.text, 'html.parser')
 
@@ -98,7 +96,6 @@ def find_data(url):
             if index == 1 and div_index == 1:
                 pattern = r'/wiki/.*'
                 decoded_text = re.sub(pattern, "", urllib.parse.unquote(a.get('href')).encode('utf-8').decode('utf-8'))
-                # print(decoded_text)
                 province = decoded_text
                 continue
 
@@ -110,12 +107,8 @@ def find_data(url):
             city_response = requests.get(url=f'https://pl.wikipedia.org/{city_url}')
             city_soup = BeautifulSoup(city_response.text, 'html.parser')
 
-            # city_province = city_soup.find('a', title_='Podział administracyjny Polski').text
-
             city_province = ''
-
             a_tag_province = city_soup.find('a', title='Podział administracyjny Polski', string='Województwo')
-            # print(a_tag_province)
             if a_tag_province:
                 tr_element = a_tag_province.find_parent('tr')
                 td_element = tr_element.find('td')
@@ -127,10 +120,6 @@ def find_data(url):
 
             city = City(url=city_url, province=city_province, city_name=city_name, latitude=latitude, longitude=longitude)
             city_list.append(city)
-
-            # a_tags_list.append(a.get('href'))
-
-    print(len(a_tags_list))
 
     for city in city_list:
         print(city.print_data_to_csv())
